@@ -1,4 +1,4 @@
-package com.bookrecs.bookrecs;
+package com.bookrecommendations.bookrecs;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
