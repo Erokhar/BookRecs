@@ -28,7 +28,7 @@
         <div class="collapse navbar-collapse"
              id="navcol-1">
             <ul class="nav navbar-nav">
-                <li class="nav-item" role="presentation"><a class="nav-link" href="#">Browse</a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link" th:href="@{/}">Browse</a></li>
                 <li class="nav-item" role="presentation"><a class="nav-link" href="#">Library</a></li>
                 <li class="nav-item" role="presentation"><a class="nav-link" href="#">Link 3</a></li>
             </ul>
@@ -63,14 +63,19 @@
 <!--        </div>-->
         <div class="container p-t-0 m-t-2 carousel-inner">
             <div class="row row-equal carousel-item active m-t-0">
-                <div class="col-md-4" th:each="string : ${strings}">
+                <div class="col-md-4" th:each="book : ${books}">
                     <div class="card">
                         <div class="card-img-top card-img-top-250">
-                            <img class="img-fluid" src="/assets/img/1.jpg" alt="Carousel 1">
+                            <img class="img-fluid" th:src="${book.getBookCoverLink()}" alt="not found">
+                            <form method="post" action="#" th:action="@{/addToLibrary}">
+                                <input type="text" id="bookTitle" name="bookTitle" th:value="${book.getBookTitle()}" style="visibility: hidden"/>
+                                <input type="text" id="bookId" name="bookId" th:value="${book.getBookId()}" style="visibility: hidden"/>
+                                <input type="submit" id="addToLibrary" value="Add" class="btn btn-primary pull-right"/>
+                            </form>
                         </div>
                         <div class="card-block p-t-2">
-                            <div class="card-header"><h3 th:text="${string.getBookTitle()}">Pic1</h3></div>
-                            <div class="card-text" th:text="${string.getBookDescription()}">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Praesentium
+                            <div class="card-header"><h4 th:text="${book.getBookTitle()}">Pic1</h4></div>
+                            <div class="card-text" th:text="${book.getBookId()}">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Praesentium
                                 animi molestias veritatis, pariatur dolorem error non reprehenderit vero, id. Incidunt
                                 hic laudantium soluta recusandae, voluptas libero et! Ipsa, maiores, ratione.
                             </div>
@@ -88,6 +93,11 @@
 <script src="./assets/bootstrap/js/bootstrap.min.js"></script>
 <script src="./assets/js/Card-slider-sk.js"></script>
 <script src="./assets/js/Media-Slider-Bootstrap-3.js"></script>
+<script>
+    $('#addToLibrary').on('click',function(){
+        var form = $('')
+    })
+</script>
 </body>
 
 </html>
