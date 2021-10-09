@@ -27,7 +27,7 @@ public class Book implements Serializable {
     @Column(name = "isbn13")
     private String isbn13;
 
-    @Column(name = "coverLink")
+    @Column(name = "cover_link")
     private String bookCoverLink;
 
     @Column(name = "language_id")
@@ -38,6 +38,9 @@ public class Book implements Serializable {
 
     @Column(name = "num_pages")
     private int numPages;
+
+    @Column(name = "author")
+    private String bookAuthor;
 
     public Book(){}
 
@@ -118,5 +121,13 @@ public class Book implements Serializable {
 
     public void setNumPages(int numPages) {
         this.numPages = numPages;
+    }
+
+    public String getBookAuthor() {
+        return bookAuthor;
+    }
+
+    public void setBookAuthor(String bookAuthor) {
+        this.bookAuthor = bookAuthor;
     }
 }

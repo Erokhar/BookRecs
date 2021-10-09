@@ -1,10 +1,7 @@
 package com.bookrecommendations.bookrecs.controllers;
 
-import com.bookrecommendations.bookrecs.models.Book;
-import com.bookrecommendations.bookrecs.models.BookUser;
-import com.bookrecommendations.bookrecs.repositories.BookRepository;
-import com.bookrecommendations.bookrecs.repositories.BookUserRepository;
-import com.bookrecommendations.bookrecs.repositories.UserRepository;
+import com.bookrecommendations.bookrecs.models.*;
+import com.bookrecommendations.bookrecs.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @ComponentScan("com.bookrecommendations.bookrecs.repositories")
@@ -25,10 +22,23 @@ public class MainController {
     BookRepository bookRepository;
 
     @Autowired
+    BookGenreRepository bookGenreRepository;
+
+    @Autowired
+    GenreRepository genreRepository;
+
+    @Autowired
     UserRepository userRepository;
 
     @Autowired
+    AuthorRepository authorRepository;
+
+    @Autowired
+    BookAuthorRepository bookAuthorRepository;
+
+    @Autowired
     BookUserRepository bookUserRepository;
+
     Logger logger = LoggerFactory.getLogger(MainController.class);
 
     public MainController() {
@@ -54,9 +64,68 @@ public class MainController {
 
     @RequestMapping("/library")
     public ModelAndView getLibraryView(ModelAndView modelAndView, HttpServletRequest request) {
+        Set<Integer> bookIds = new HashSet<>();
+        Set<Integer> genreIds = new HashSet<>();
+        Set<Integer> authorIds = new HashSet<>();
+        Map<Integer, String> mapGenresByBooks;
+        Map<Integer, Genre> mapGenresById = new HashMap<>();
+        Map<Integer, Book> mapBooksById = new HashMap<>();
 
+        List<BookUser> bookUserList = bookUserRepository.findByUserid(Integer.parseInt(request.getSession().getAttribute("userid").toString()));
+        for (BookUser bookUser : bookUserList) {
+            bookIds.add(bookUser.getBookid());
+        }
+        List<Book> bookList = bookRepository.findBooksByBookIdIn(bookIds);
+        for (Book book : bookList) {
+            mapBooksById.put(book.getBookId(), book);
+        }
+        List<BookGenre> bookGenreList = bookGenreRepository.findByBookIdIn(bookIds);
+        for (BookGenre bookGenre : bookGenreList) {
+            genreIds.add(bookGenre.getGenre_id());
+        }
+        List<Genre> genreList = genreRepository.findByGenreIdIn(genreIds);
+        for (Genre genre : genreList) {
+            mapGenresById.put(genre.getGenreId(), genre);
+        }
+        mapGenresByBooks = getMapGenresByBooks(bookIds, bookGenreList, mapGenresById);
+
+        //TODO Do the same process as the book_genre for the book_author
+
+        List<BookAuthor> bookAuthorList = bookAuthorRepository.findByBookIdIn(bookIds);
+        for (BookAuthor bookAuthor : bookAuthorList) {
+            authorIds.add(bookAuthor.getAuthorId());
+        }
+        List<Author> authors = authorRepository.findByAuthorIdIn(authorIds);
+        for (Author author : authors) {
+            for (BookAuthor bookAuthor : bookAuthorList) {
+                if (author.getAuthorId().equals(bookAuthor.getAuthorId())) {
+                    mapBooksById.get(bookAuthor.getBookId()).setBookAuthor(author.getAuthorName());
+                }
+            }
+        }
+
+        modelAndView.addObject("mapGenresByBooks", mapGenresByBooks);
+        modelAndView.addObject("bookList", bookList);
         modelAndView.setViewName("libraryView");
         return modelAndView;
+    }
+
+    public Map<Integer, String> getMapGenresByBooks(Set<Integer> bookIds, List<BookGenre> bookGenreList, Map<Integer, Genre> mapGenresById) {
+        Map<Integer, String> mapGenresByBooks = new HashMap<>();
+        for (Integer bookId : bookIds) {
+            for (BookGenre bookGenre : bookGenreList) {
+                if (bookId == bookGenre.getBook_id()) {
+                    mapGenresByBooks.putIfAbsent(bookId, "");
+                    if (mapGenresById.get(bookGenre.getGenre_id()) != null && !mapGenresByBooks.get(bookId).equals("")) {
+                        mapGenresByBooks.put(bookId, mapGenresByBooks.get(bookId) + ", " + mapGenresById.get(bookGenre.getGenre_id()).getTitle());
+                    } else {
+                        mapGenresByBooks.put(bookId, mapGenresById.get(bookGenre.getGenre_id()).getTitle());
+                    }
+                }
+            }
+        }
+
+        return mapGenresByBooks;
     }
 
 }

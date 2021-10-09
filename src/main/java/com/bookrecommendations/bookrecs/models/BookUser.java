@@ -11,6 +11,9 @@ import java.io.Serializable;
 public class BookUser implements Serializable {
 
     @Id
+    @Column(name = "book_user_id")
+    private Integer bookUserId;
+
     @Column(name = "book_id")
     private Integer bookid;
 

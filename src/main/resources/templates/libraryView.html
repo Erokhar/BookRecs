@@ -26,8 +26,8 @@
             <div class="collapse navbar-collapse"
                 id="navcol-1">
                 <ul class="nav navbar-nav">
-                    <li class="nav-item" role="presentation"><a class="nav-link active" href="#">Link 1</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="#">Link 2</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="/">Browse</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" href="/library">Library</a></li>
                     <li class="nav-item" role="presentation"><a class="nav-link" href="#">Link 3</a></li>
                 </ul>
                 <form class="form-inline mr-auto" target="_self">
@@ -42,20 +42,22 @@
         <!-- End: Search Input (responsive) -->
         <div>
             <ul class="nav nav-tabs">
-                <li class="nav-item"><a class="nav-link active" role="tab" data-toggle="tab" href="#tab-1">Tab 1</a></li>
+                <li class="nav-item"><a class="nav-link active" role="tab" data-toggle="tab" href="#tab-1">Library</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" role="tabpanel" id="tab-1">
                     <div>
                         <div>
-                            <ul class="list-group">
+                            <ul class="list-group" th:each="book : ${bookList}">
                                 <li class="list-group-item">
-                                    <div class="media"><img class="mr-3">
+                                    <div class="media"><img class="mr-3" th:src="${book.getBookCoverLink()}" height="150px" width="125px">
                                         <div class="media-body">
-                                            <h5>Media Heading</h5>
-                                            <p th:text="${bookid}">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis maximus nisl ac diam feugiat, non vestibulum libero posuere. Vivamus pharetra leo non nulla egestas, nec malesuada orci finibus. </p>
+                                            <h5 th:text="${book.getBookTitle()}">Media Heading</h5>
+                                            <p th:text="${' By '+book.getBookAuthor()}"></p>
+                                            <p th:text="${mapGenresByBooks.get(book.getBookId())}"></p>
+                                            <p th:text="${book.getBookDescription()}">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis maximus nisl ac diam feugiat, non vestibulum libero posuere. Vivamus pharetra leo non nulla egestas, nec malesuada orci finibus. </p>
                                         </div>
-                                    </div><span>List Group Item 1</span></li>
+                                    </div><!--span>List Group Item 1</span--></li>
                             </ul>
                         </div>
                     </div>
