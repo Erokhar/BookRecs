@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    List<User> findByUsername(String BookTitle);
+    List<User> findByUsername(String username);
     List<User> findByUserId(int userId);
 
     @Query(value = "select * from user LIMIT 2", nativeQuery = true)

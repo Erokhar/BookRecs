@@ -28,9 +28,8 @@
         <div class="collapse navbar-collapse"
              id="navcol-1">
             <ul class="nav navbar-nav">
-                <li class="nav-item" role="presentation"><a class="nav-link" href="/">Browse</a></li>
+                <li class="nav-item" role="presentation"><a class="nav-link" href="/browseView">Browse</a></li>
                 <li class="nav-item" role="presentation"><a class="nav-link" href="/library">Library</a></li>
-                <li class="nav-item" role="presentation"><a class="nav-link" href="#">Link 3</a></li>
             </ul>
             <form class="form-inline mr-auto" target="_self">
                 <div class="form-group"><label for="search-field"><i class="fa fa-search"></i></label><input
@@ -65,16 +64,18 @@
             <div class="row row-equal carousel-item active m-t-0">
                 <div class="col-md-4" th:each="book : ${books}">
                     <div class="card">
-                        <div class="card-img-top card-img-top-250">
-                            <img class="img-fluid" th:src="${book.getBookCoverLink()}" alt="not found">
-                            <form method="post" action="#" th:action="@{/addToLibrary}">
-                                <input type="text" id="bookTitle" name="bookTitle" th:value="${book.getBookTitle()}" style="visibility: hidden"/>
-                                <input type="text" id="bookId" name="bookId" th:value="${book.getBookId()}" style="visibility: hidden"/>
-                                <input type="submit" id="addToLibrary" value="Add" class="btn btn-primary pull-right"/>
-                            </form>
+                        <div class="card-img-top card-img-top-250 text-center">
+                            <img class="img-fluid" th:src="${book.getBookCoverLink()}"  onerror="this.src='/assets/img/notFound.jpg'" height="150px" width="150px">
+
                         </div>
                         <div class="card-block p-t-2">
-                            <div class="card-header"><h4 th:text="${book.getBookTitle()}">Pic1</h4></div>
+                            <div class="card-header"><h4 th:text="${book.getBookTitle()}">Pic1</h4><p th:text="${book.getBookAuthor()}"></p>
+                                <form method="post" action="#" th:action="@{/addToLibrary}" style="position:relative">
+                                    <input type="text" id="bookTitle" name="bookTitle" th:value="${book.getBookTitle()}" style="visibility: hidden"/>
+                                    <input type="text" id="bookId" name="bookId" th:value="${book.getBookId()}" style="visibility: hidden"/>
+                                    <input type="submit" id="addToLibrary" value="Add" class="btn btn-primary btn-block"/>
+                                </form>
+                            </div>
                             <div class="card-text" th:text="${book.getBookId()}">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Praesentium
                                 animi molestias veritatis, pariatur dolorem error non reprehenderit vero, id. Incidunt
                                 hic laudantium soluta recusandae, voluptas libero et! Ipsa, maiores, ratione.

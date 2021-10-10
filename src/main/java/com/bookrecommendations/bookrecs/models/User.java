@@ -5,12 +5,12 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user",schema = "public")
 @Component("User")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_Id")
+    @Column(name = "user_id")
     private int userId;
 
     @Column(name = "name")

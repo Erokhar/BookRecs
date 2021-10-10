@@ -18,6 +18,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByBookId(int bookId);
     List<Book> findBooksByBookIdIn(@Param("ids")Set<Integer> ids);
 
-    @Query(value = "select * from book b LIMIT 2", nativeQuery = true)
+    @Query(value = "select * from book b order by RANDOM() LIMIT 3", nativeQuery = true)
     List<Book> findAll();
 }

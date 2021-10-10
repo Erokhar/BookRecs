@@ -36,4 +36,12 @@ public class BookUser implements Serializable {
     public void setUserid(int userid) {
         this.userid = userid;
     }
+
+    public Integer getBookUserId() {
+        return bookUserId;
+    }
+
+    public void setBookUserId(Integer bookUserId) {
+        this.bookUserId = bookUserId;
+    }
 }
