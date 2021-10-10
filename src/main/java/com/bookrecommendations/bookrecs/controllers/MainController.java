@@ -47,6 +47,10 @@ public class MainController {
 
     @RequestMapping("/browseView")
     public ModelAndView process(ModelAndView modelAndView, HttpServletRequest request) {
+        if(request.getSession().getAttribute("userid")==null){
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
         Set<Integer> bookIds = new HashSet<>();
         Map<Integer, Book> mapBooksById = new HashMap<>();
         List<Book> books = bookRepository.findAll();
@@ -55,7 +59,7 @@ public class MainController {
             bookIds.add(book.getBookId());
         }
 
-        books = setAuthorsOfBooks(bookIds,mapBooksById);
+        books = setAuthorsOfBooks(bookIds, mapBooksById);
 
         modelAndView.addObject("books", books);
         modelAndView.setViewName("browseView");
@@ -64,17 +68,32 @@ public class MainController {
 
     @PostMapping("/addToLibrary")
     public String addToLibrary(ModelAndView modelAndView, HttpServletRequest request) {
+        if(request.getSession().getAttribute("userid")==null){
+            return "redirect:/";
+        }
         BookUser bookUser = new BookUser();
+        Boolean inLibrary = false;
         bookUser.setBookid(Integer.parseInt(request.getParameter("bookId")));
         bookUser.setUserid(Integer.parseInt(request.getSession().getAttribute("userid").toString()));
-        List<BookUser> resultSet =  bookUserRepository.findAll();
-        bookUser.setBookUserId(resultSet.size() + 1);
-        bookUserRepository.save(bookUser);
+        List<BookUser> resultSet = bookUserRepository.findAll();
+        for (BookUser bu : resultSet) {
+            if (bookUser.getBookid() == (bu.getBookid())) {
+                inLibrary = true;
+            }
+        }
+        if (!inLibrary) {
+            bookUser.setBookUserId(resultSet.size() + 1);
+            bookUserRepository.save(bookUser);
+        }
         return "redirect:/library";
     }
 
     @RequestMapping("/library")
     public ModelAndView getLibraryView(ModelAndView modelAndView, HttpServletRequest request) {
+        if(request.getSession().getAttribute("userid")==null){
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
         Set<Integer> bookIds = new HashSet<>();
         Map<Integer, String> mapGenresByBooks;
         Map<Integer, Genre> mapGenresById = new HashMap<>();
@@ -90,7 +109,7 @@ public class MainController {
         }
 
         mapGenresByBooks = getMapGenresByBooks(bookIds, mapGenresById);
-        bookList = setAuthorsOfBooks(bookIds,mapBooksById);
+        bookList = setAuthorsOfBooks(bookIds, mapBooksById);
 
         modelAndView.addObject("mapGenresByBooks", mapGenresByBooks);
         modelAndView.addObject("bookList", bookList);
@@ -125,14 +144,14 @@ public class MainController {
         return mapGenresByBooks;
     }
 
-    public List<Book> setAuthorsOfBooks(Set<Integer> bookIds, Map<Integer,Book> mapBooksById){
+    public List<Book> setAuthorsOfBooks(Set<Integer> bookIds, Map<Integer, Book> mapBooksById) {
         Set<Integer> authorIds = new HashSet<>();
         List<BookAuthor> bookAuthorList = bookAuthorRepository.findByBookIdIn(bookIds);
         for (BookAuthor bookAuthor : bookAuthorList) {
             authorIds.add(bookAuthor.getAuthorId());
         }
         List<Author> authors = authorRepository.findByAuthorIdIn(authorIds);
-        logger.info(""+authorIds.size());
+        logger.info("" + authorIds.size());
         for (Author author : authors) {
             for (BookAuthor bookAuthor : bookAuthorList) {
                 if (author.getAuthorId().equals(bookAuthor.getAuthorId())) {
@@ -141,7 +160,7 @@ public class MainController {
             }
         }
         List<Book> books = new ArrayList<>();
-        for(Integer key : mapBooksById.keySet()){
+        for (Integer key : mapBooksById.keySet()) {
             books.add(mapBooksById.get(key));
         }
 
@@ -149,19 +168,19 @@ public class MainController {
     }
 
     @RequestMapping("/bookView")
-    public ModelAndView getBookView(ModelAndView modelAndView, HttpServletRequest request){
+    public ModelAndView getBookView(ModelAndView modelAndView, HttpServletRequest request) {
         modelAndView.setViewName("bookView");
         return modelAndView;
     }
 
     @RequestMapping("/")
-    public ModelAndView getLoginView(ModelAndView modelAndView, HttpServletRequest request){
-        if(request.getSession().getAttribute("wrongPassword")!=null){
-            modelAndView.addObject("wrongPassword",request.getSession().getAttribute("wrongPassword"));
+    public ModelAndView getLoginView(ModelAndView modelAndView, HttpServletRequest request) {
+        if (request.getSession().getAttribute("wrongPassword") != null) {
+            modelAndView.addObject("wrongPassword", request.getSession().getAttribute("wrongPassword"));
             request.getSession().removeAttribute("wrongPassword");
         }
-        if(request.getSession().getAttribute("userNotFound")!=null){
-            modelAndView.addObject("userNotFound",request.getSession().getAttribute("userNotFound"));
+        if (request.getSession().getAttribute("userNotFound") != null) {
+            modelAndView.addObject("userNotFound", request.getSession().getAttribute("userNotFound"));
             request.getSession().removeAttribute("userNotFound");
         }
         modelAndView.setViewName("loginView");
@@ -169,22 +188,22 @@ public class MainController {
     }
 
     @RequestMapping("/connectUser")
-    public ModelAndView connectUser(ModelAndView modelAndView, HttpServletRequest request){
+    public ModelAndView connectUser(ModelAndView modelAndView, HttpServletRequest request) {
         List<User> users = userRepository.findByUsername(request.getParameter("userLogin"));
         User user;
-        if(users!=null && !users.isEmpty()){
+        if (users != null && !users.isEmpty()) {
             user = users.get(0);
-            if(user.getUserpassword().equals(request.getParameter("userPassword"))){
-                request.getSession().setAttribute("userid",user.getUserId());
+            if (user.getUserpassword().equals(request.getParameter("userPassword"))) {
+                request.getSession().setAttribute("userid", user.getUserId());
                 modelAndView.setViewName("redirect:/browseView");
-            }else{
-                request.getSession().setAttribute("wrongPassword","Wrong Password!");
+            } else {
+                request.getSession().setAttribute("wrongPassword", "Wrong Password!");
                 //modelAndView.addObject("wrongPassword","Wrong Password!");
                 modelAndView.setViewName("redirect:/");
                 return modelAndView;
             }
-        }else{
-            request.getSession().setAttribute("userNotFound","Username Not Found!");
+        } else {
+            request.getSession().setAttribute("userNotFound", "Username Not Found!");
             //modelAndView.addObject("userNotFound","Username Not Found!");
             modelAndView.setViewName("redirect:/");
             return modelAndView;
@@ -192,13 +211,18 @@ public class MainController {
 
         return modelAndView;
     }
+
+    @RequestMapping("/logoutUser")
+    public ModelAndView logoutUser(ModelAndView modelAndView, HttpServletRequest request){
+        request.getSession().removeAttribute("userid");
+        modelAndView.setViewName("redirect:/");
+        return modelAndView;
+    }
 }
 
 //TODO Improve Library
 //TODO BookView
-//TODO Authentification System
 //TODO Session Management (login/logout)
-//TODO Add pictures to the books
 //TODO Add Search functionality
 
 
